@@ -3,6 +3,14 @@ import { Github, ExternalLink } from 'lucide-react';
 const Projects = () => {
   const projects = [
     {
+      title: 'Portfolio Website',
+      description: 'A personal portfolio website showcasing projects, skills, and contact details with a clean, responsive, and animated design.',
+      techStack: ['React', 'Tailwind CSS', 'TypeScript'],
+      githubUrl: 'https://github.com/anilkumar0509/portfolio',
+      liveUrl: 'https://portfolio-steel-nine-95.vercel.app/',
+      image: 'portfolio.png'
+    },
+    {
       title: 'Weather GUI',
       description: 'A graphical user interface application that displays weather data for selected locations in a clean and interactive format.',
       techStack: ['Python', 'Tkinter', 'API'],
