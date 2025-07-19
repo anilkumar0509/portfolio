@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Award, Target } from 'lucide-react';
+import { TrendingUp, Award, Target, Trophy } from 'lucide-react';
 
 interface LeetCodeStats {
   totalSolved: number;
@@ -153,7 +153,10 @@ const LeetCode: React.FC = () => {
                 </div>
                 <div className="w-full bg-black/30 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full ${difficulty.color.replace('text-', 'bg-')}`}
+                    className={`h-2 rounded-full ${difficulty.color.replace(
+                      'text-',
+                      'bg-'
+                    )}`}
                     style={{
                       width: `${Math.min(
                         (difficulty.count / maxCount) * 100,
@@ -165,6 +168,19 @@ const LeetCode: React.FC = () => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* LeetCode Profile Link */}
+        <div className="text-center mt-10">
+          <a
+            href="https://leetcode.com/anilkumarbhumireddy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-red-600 text-white rounded-full hover:from-blue-500 hover:to-red-500 transition-all duration-300 font-medium galaxy-glow"
+          >
+            <Trophy size={20} />
+            View LeetCode Profile
+          </a>
         </div>
       </div>
     </section>
