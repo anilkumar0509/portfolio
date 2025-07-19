@@ -1,6 +1,5 @@
-
-import { useState, useEffect } from 'react';
-import { Trophy, Target, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, Award, Target } from 'lucide-react';
 
 interface LeetCodeStats {
   totalSolved: number;
@@ -10,120 +9,163 @@ interface LeetCodeStats {
   hard: number;
 }
 
-const LeetCode = () => {
+interface Difficulty {
+  name: string;
+  count: number;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+}
+
+const LeetCode: React.FC = () => {
   const [stats, setStats] = useState<LeetCodeStats>({
     totalSolved: 0,
-    ranking: 5000001,
+    ranking: 0,
     easy: 0,
     medium: 0,
-    hard: 0
+    hard: 0,
   });
-
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // Simulate API call or use actual LeetCode GraphQL API
-    const fetchLeetCodeStats = async () => {
+    const fetchLeetStats = async () => {
       try {
-        // This is a placeholder - in a real app, you'd call the LeetCode GraphQL API
-        setTimeout(() => {
-          setStats({
-            totalSolved: 12,
-            ranking: 4255501,
-            easy: 3,
-            medium: 4,
-            hard: 5
-          });
-          setLoading(false);
-        }, 1500);
+        const res = await fetch(
+          'https://leetcode-stats-api.herokuapp.com/anilkumarbhumireddy'
+        );
+        const data = await res.json();
+
+        const easy = data.easySolved || 0;
+        const medium = data.mediumSolved || 0;
+        const hard = data.hardSolved || 0;
+        const total = easy + medium + hard;
+        const rank = data.ranking || 0;
+
+        setStats({
+          totalSolved: total,
+          ranking: rank,
+          easy,
+          medium,
+          hard,
+        });
       } catch (error) {
         console.error('Error fetching LeetCode stats:', error);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchLeetCodeStats();
+    fetchLeetStats();
   }, []);
 
-  const difficultyData = [
-    { label: 'Easy', count: stats.easy, color: 'text-green-400', bgColor: 'bg-green-500/20', borderColor: 'border-green-400/30' },
-    { label: 'Medium', count: stats.medium, color: 'text-yellow-400', bgColor: 'bg-yellow-500/20', borderColor: 'border-yellow-400/30' },
-    { label: 'Hard', count: stats.hard, color: 'text-red-400', bgColor: 'bg-red-500/20', borderColor: 'border-red-400/30' },
+  const difficultyData: Difficulty[] = [
+    {
+      name: 'Easy',
+      count: stats.easy,
+      color: 'text-green-400',
+      bgColor: 'bg-green-500/10',
+      borderColor: 'border-green-500/30',
+    },
+    {
+      name: 'Medium',
+      count: stats.medium,
+      color: 'text-yellow-400',
+      bgColor: 'bg-yellow-500/10',
+      borderColor: 'border-yellow-500/30',
+    },
+    {
+      name: 'Hard',
+      count: stats.hard,
+      color: 'text-red-400',
+      bgColor: 'bg-red-500/10',
+      borderColor: 'border-red-500/30',
+    },
   ];
 
+  if (loading) {
+    return (
+      <section id="leetcode" className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-purple-400">
+            Loading LeetCode Stats...
+          </h2>
+        </div>
+      </section>
+    );
+  }
+
+  const maxCount = Math.max(...difficultyData.map((d) => d.count), 1);
+
   return (
-    <section id="leetcode" className="min-h-screen py-20 px-8 relative">
+    <section id="leetcode" className="py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-center mb-16">
-          <span className="bg-gradient-to-r from-blue-400 to-red-400 bg-clip-text text-transparent">
-            LeetCode Progress
-          </span>
-        </h2>
-        
-        {loading ? (
-          <div className="text-center">
-            <div className="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-400">Loading LeetCode stats...</p>
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            <span className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              LeetCode Stats
+            </span>
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-purple-400 to-pink-500 mx-auto"></div>
+        </div>
+
+        {/* Top Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white/5 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 text-center">
+            <TrendingUp className="w-8 h-8 text-purple-400 mx-auto mb-3" />
+            <h3 className="text-2xl font-bold text-white mb-2">
+              {stats.totalSolved}
+            </h3>
+            <p className="text-gray-400">Problems Solved</p>
           </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Main Stats */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-black/40 backdrop-blur-sm p-6 rounded-xl text-center border border-blue-400/20 hover:border-blue-400/40 transition-all duration-300 galaxy-glow-hover">
-                <Trophy className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-3xl font-bold text-white mb-2">{stats.totalSolved}</h3>
-                <p className="text-gray-400">Total Solved</p>
-              </div>
-              
-              <div className="bg-black/40 backdrop-blur-sm p-6 rounded-xl text-center border border-red-400/20 hover:border-red-400/40 transition-all duration-300 galaxy-glow-hover">
-                <Target className="w-12 h-12 text-red-400 mx-auto mb-4" />
-                <h3 className="text-3xl font-bold text-white mb-2">#{stats.ranking.toLocaleString()}</h3>
-                <p className="text-gray-400">Global Ranking</p>
-              </div>
-              
-              <div className="bg-black/40 backdrop-blur-sm p-6 rounded-xl text-center border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300 galaxy-glow-hover">
-                <TrendingUp className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-                <h3 className="text-3xl font-bold text-white mb-2">Active</h3>
-                <p className="text-gray-400">Status</p>
-              </div>
-            </div>
 
-            {/* Difficulty Breakdown */}
-            <div className="bg-black/40 backdrop-blur-sm p-8 rounded-xl border border-blue-400/20">
-              <h3 className="text-2xl font-semibold text-center mb-8 text-white">
-                Problems by Difficulty
-              </h3>
-              
-              <div className="grid md:grid-cols-3 gap-6">
-                {difficultyData.map((item, index) => (
-                  <div key={index} className={`${item.bgColor} p-6 rounded-lg text-center border ${item.borderColor}`}>
-                    <h4 className={`text-2xl font-bold ${item.color} mb-2`}>{item.count}</h4>
-                    <p className="text-gray-400">{item.label}</p>
-                    <div className="mt-3 w-full bg-gray-700 rounded-full h-2">
-                      <div 
-                        className={`h-2 rounded-full ${item.color.replace('text-', 'bg-')}`}
-                        style={{ width: `${(item.count / stats.totalSolved) * 100}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="bg-white/5 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 text-center">
+            <Award className="w-8 h-8 text-yellow-400 mx-auto mb-3" />
+            <h3 className="text-2xl font-bold text-white mb-2">
+              #{stats.ranking.toLocaleString()}
+            </h3>
+            <p className="text-gray-400">Global Ranking</p>
+          </div>
 
-            {/* LeetCode Profile Link */}
-            <div className="text-center">
-              <a 
-                href="https://leetcode.com/anilkumarbhumireddy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-red-600 text-white rounded-full hover:from-blue-500 hover:to-red-500 transition-all duration-300 font-medium galaxy-glow"
+          <div className="bg-white/5 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 text-center">
+            <Target className="w-8 h-8 text-violet-400 mx-auto mb-3" />
+            <h3 className="text-2xl font-bold text-white mb-2">Active</h3>
+            <p className="text-gray-400">Status</p>
+          </div>
+        </div>
+
+        {/* Difficulty Breakdown */}
+        <div className="bg-white/5 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-8">
+          <h3 className="text-xl font-semibold text-purple-400 mb-6 text-center">
+            Problems by Difficulty
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {difficultyData.map((difficulty, index) => (
+              <div
+                key={index}
+                className={`${difficulty.bgColor} ${difficulty.borderColor} border rounded-xl p-6 text-center hover:scale-105 transition-transform duration-300`}
               >
-                <Trophy size={20} />
-                View LeetCode Profile
-              </a>
-            </div>
+                <h4 className={`text-lg font-semibold ${difficulty.color} mb-2`}>
+                  {difficulty.name}
+                </h4>
+                <div className={`text-3xl font-bold ${difficulty.color} mb-2`}>
+                  {difficulty.count}
+                </div>
+                <div className="w-full bg-black/30 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full ${difficulty.color.replace('text-', 'bg-')}`}
+                    style={{
+                      width: `${Math.min(
+                        (difficulty.count / maxCount) * 100,
+                        100
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
